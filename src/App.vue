@@ -1,6 +1,7 @@
 <template>
   <v-app id="inspire">
     <v-content>
+     <div class="example text-center">Example</div>
       <v-container class="fill-height" fluid>
         <v-row align="center" justify="center">
           <v-col cols="12" sm="8" md="4">
@@ -21,12 +22,14 @@
                 <v-btn @click="submit" color="primary">Calculate</v-btn>
               </v-card-actions>
             </v-card>
-            <div v-html="css"></div>
           </v-col>
         </v-row>
       </v-container>
     </v-content>
-    <div class="test">test</div>
+
+
+    <Modal title="Your CSS" :message="css" :show="modal"  @close="modal = false"/>
+
   </v-app>
 </template>
 
@@ -34,13 +37,16 @@
 import Modal from "./components/Modal";
 export default {
   name: "App",
-  components: {},
+  components: {
+    Modal
+  },
   data: () => ({
     minFont: 12,
     maxFont: 40,
     minMQ: 360,
     maxMQ: 960,
-    css: ""
+    css: "",
+    modal: false,
   }),
 
   methods: {
@@ -51,32 +57,45 @@ export default {
       let y = m + b;
       let short = m * 100;
       
-      this.css = `
-        font-size: ${minFont}px;
+    this.css = `
+  .example{
+    font-size: ${minFont}px;
+  }
 
-        @media(min-width:${minMQ}px){
-          font-size: calc(${short}vw + ${b}px);
-        }
-
-        @media(min-width:${maxMQ}px){
-          font-size: ${maxFont}px;
-        }
-      `;
-      
+  @media(min-width:${minMQ}px){
+    .example{
+      font-size: calc(${short}vw + ${b}px);
     }
+  }
+
+  @media(min-width:${maxMQ}px){
+    .example{
+      font-size: ${maxFont}px;
+    }
+  }
+    `;
+    
+      this.modal=true;
+      this.setCss();
+    },
+
+    setCss(){
+      const {css} = this;
+      if(!document.querySelector('#example')){
+        let style = document.createElement('style');
+        style.type = 'text/css';
+        style.id = 'example'
+        style.innerHTML = css;
+        document.querySelector('head').appendChild(style);
+      }
+      else{
+        let style = document.querySelector('#example');
+        style.innerHTML = css;
+      }
+    }
+
   }
 };
 </script>
 
 
-<style lang="scss" scoped>
-.test {
-  font-size: 12px;
-  @media (min-width: 360px) {
-    font-size: calc(14.666666666666666vw + -40.8px);
-  }
-  @media (min-width: 960px) {
-    font-size: 100px;
-  }
-}
-</style>
